@@ -4,7 +4,8 @@ import numpy as np
 class Track:
     """Closed track: a centerline plus a constant width. Units are meters."""
 
-    def __init__(self, centerline, width=14.0):
+    def __init__(self, centerline, width=14.0, name="Track"):
+        self.name = name
         self.center = np.asarray(centerline, dtype=float)      # (N, 2)
         self.width = width
         n = len(self.center)
@@ -43,7 +44,7 @@ class Track:
             amp = rng.uniform(0.0, 0.20 / (k - 1)) * base_radius
             r += amp * np.cos(k * theta + rng.uniform(0, 2 * np.pi))
         pts = np.stack([r * np.cos(theta), r * np.sin(theta)], axis=1)
-        return cls(pts, width)
+        return cls(pts, width, name=f"Random #{seed}")
 
     # ---- queries ----
     def nearest_index(self, pos):
