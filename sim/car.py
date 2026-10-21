@@ -9,16 +9,19 @@ class Car:
 
     WHEELBASE = 3.0        # m
     MAX_STEER = 0.5        # rad, front wheel angle at g = 1
-    MAX_ACCEL = 14.0       # m/s^2 at full gas
-    MAX_BRAKE = 28.0       # m/s^2 at full brake
-    DRAG = 0.005           # quadratic drag -> top speed ~ 53 m/s (190 km/h)
+    MAX_ACCEL = 16.0       # m/s^2 at full gas
+    MAX_BRAKE = 35.0       # m/s^2 at full brake
+    DRAG = 0.0018          # quadratic drag -> top speed ~ 93.4 m/s (336 km/h)
     ROLLING = 0.3          # m/s^2 constant resistance
-    MAX_LAT_ACCEL = 25.0   # m/s^2 grip limit, makes the car run wide when too fast
+    MAX_LAT_ACCEL = 38.0   # m/s^2 grip limit (~3.9G), high-downforce racing grip
 
     def __init__(self, pos, heading):
         self.pos = np.array(pos, dtype=float)
         self.heading = float(heading)
         self.speed = 0.0
+        self.yaw_rate = 0.0
+        self.lat_accel = 0.0
+        self.accel = 0.0
 
     def update(self, f, g, dt=0.05):
         f = float(np.clip(f, -1, 1))
@@ -27,6 +30,7 @@ class Car:
         # longitudinal: gas, brake, drag. No reverse gear.
         accel = f * self.MAX_ACCEL if f > 0 else f * self.MAX_BRAKE
         accel -= self.DRAG * self.speed ** 2 + self.ROLLING
+        self.accel = float(accel)
         self.speed = max(0.0, self.speed + accel * dt)
 
         # steering: bicycle model, yaw rate capped by tire grip
@@ -34,6 +38,8 @@ class Car:
         if self.speed > 1e-3:
             cap = self.MAX_LAT_ACCEL / self.speed
             yaw = float(np.clip(yaw, -cap, cap))
+        self.yaw_rate = yaw
+        self.lat_accel = self.speed * yaw
         self.heading += yaw * dt
 
         self.pos += self.speed * dt * np.array([np.cos(self.heading), np.sin(self.heading)])

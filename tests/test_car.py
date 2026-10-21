@@ -6,7 +6,7 @@ def test_full_gas_reaches_top_speed():
     c = Car([0, 0], 0.0)
     for _ in range(1200):                 # 60 s
         c.update(1, 0)
-    assert 45 < c.speed < 60
+    assert 85 < c.speed < 100
 
 
 def test_brake_stops_and_never_reverses():

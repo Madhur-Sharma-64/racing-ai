@@ -29,4 +29,4 @@ def test_rays_on_centerline_are_bounded_by_track_width():
     i = 50
     heading = np.arctan2(*tr.tangent[i][::-1])
     d = cast_rays(tr.center[i], heading, tr.segments)
-    assert d[0] < 15 and d[4] < 15          # side rays hit the nearby walls
+    assert d[0] < 15 and d[-1] < 15          # side rays hit the nearby walls
